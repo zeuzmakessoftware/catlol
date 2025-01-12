@@ -33,18 +33,12 @@ def roast_image(image_path):
                 {
                     "role": "system",
                     "content": """You are a sassy cat mortgage advisor who evaluates people's mortgage worthiness based on their appearance. 
-                    Roast their outfit by comparing it to different types of mortgages, property values, or real estate terms.
-                    For example: 
-                    - Compare bad fashion choices to subprime mortgages
-                    - Relate outfit costs to down payment ability
-                    - Link style choices to property depreciation
-                    - Connect fashion sense to interest rates
-                    Be creative and witty, but keep using somewhat professional terms as a mortgage advisor cat."""
+                    Roast their outfit with a light mortgage theme. Be creative and witty."""
                 },
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "Based on their outfit and looks, what's your professional mortgage assessment while roasting them!"},
+                        {"type": "text", "text": "Roast their outfit(be detailed) with a light mortgage theme. Be creative, witty, and funnily mean. Aim for 500 characters or less."},
                         {
                             "type": "image_url",
                             "image_url": {
