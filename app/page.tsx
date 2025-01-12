@@ -140,15 +140,19 @@ export default function Home() {
 
   const capturePhoto = async () => {
     if (cameraRef.current) {
-      setIsLoading(true);
+      // Capture the frame first
       const canvas = document.createElement('canvas');
       canvas.width = cameraRef.current.videoWidth;
       canvas.height = cameraRef.current.videoHeight;
       canvas.getContext('2d')?.drawImage(cameraRef.current, 0, 0);
       const photo = canvas.toDataURL('image/jpeg');
       
+      // Immediately stop camera and hide interface
+      stopCamera();
+      setIsLoading(true);
+      
       try {
-        // Upload the image
+        // Rest of the upload and roast logic
         const response = await fetch('/api/upload', {
           method: 'POST',
           headers: {
@@ -180,7 +184,6 @@ export default function Home() {
         setCurrentMessage("*sad meow* Something went wrong with the roast! 😿");
       } finally {
         setIsLoading(false);
-        stopCamera();
       }
     }
   };
