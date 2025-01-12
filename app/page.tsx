@@ -138,6 +138,22 @@ export default function Home() {
     setShowCamera(false);
   };
 
+  const playVideo = () => {
+    if (videoRef.current) {
+      setIsPlaying(true);
+      const randomPoints = [1.5, 4.3, 7.7];
+      const randomStart = randomPoints[Math.floor(Math.random() * randomPoints.length)];
+      videoRef.current.currentTime = randomStart;
+      videoRef.current.play();
+
+      setTimeout(() => {
+        videoRef.current?.pause();
+        videoRef.current!.currentTime = 0;
+        setIsPlaying(false);
+      }, 2200);
+    }
+  };
+
   const capturePhoto = async () => {
     if (cameraRef.current) {
       // Capture the frame first
@@ -150,9 +166,12 @@ export default function Home() {
       // Immediately stop camera and hide interface
       stopCamera();
       setIsLoading(true);
+      setShowSpeechBubble(true);
       
       try {
-        // Rest of the upload and roast logic
+        // Start playing video while waiting
+        const playVideoInterval = setInterval(playVideo, 2500);
+        
         const response = await fetch('/api/upload', {
           method: 'POST',
           headers: {
@@ -163,7 +182,6 @@ export default function Home() {
 
         const data = await response.json();
         if (data.success) {
-          // Get the roast
           const roastResponse = await fetch('/api/getRoast', {
             method: 'POST',
             headers: {
@@ -173,6 +191,9 @@ export default function Home() {
           });
           
           const roastData = await roastResponse.json();
+          // Clear the interval once we have a response
+          clearInterval(playVideoInterval);
+          
           if (roastData.success) {
             setCurrentMessage(roastData.roast);
           } else {
@@ -184,6 +205,10 @@ export default function Home() {
         setCurrentMessage("*sad meow* Something went wrong with the roast! 😿");
       } finally {
         setIsLoading(false);
+        if (videoRef.current) {
+          videoRef.current.pause();
+          videoRef.current.currentTime = 0;
+        }
       }
     }
   };
