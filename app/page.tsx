@@ -138,14 +138,33 @@ export default function Home() {
     setShowCamera(false);
   };
 
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
     if (cameraRef.current) {
       const canvas = document.createElement('canvas');
       canvas.width = cameraRef.current.videoWidth;
       canvas.height = cameraRef.current.videoHeight;
       canvas.getContext('2d')?.drawImage(cameraRef.current, 0, 0);
       const photo = canvas.toDataURL('image/jpeg');
-      console.log('Captured photo:', photo);
+      
+      try {
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ image: photo }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          console.log('Image saved successfully:', data.filename);
+        } else {
+          console.error('Failed to save image');
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+
       stopCamera();
     }
   };
