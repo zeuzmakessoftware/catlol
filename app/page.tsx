@@ -114,14 +114,26 @@ export default function Home() {
             </p>
           </div>
           <form onSubmit={handleSubmit} className="mt-4">
-            <input
-              type="text"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              placeholder="Ask about mortgages..."
-              className="w-full px-4 py-2 bg-[#FDE2F3] rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 font-mono placeholder-[#2A2F4F]/50 text-[#2A2F4F]"
-              disabled={isLoading}
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                placeholder="Ask about mortgages..."
+                className="flex-1 px-4 py-2 bg-[#FDE2F3] rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 font-mono placeholder-[#2A2F4F]/50 text-[#2A2F4F]"
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                className="px-4 py-2 bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-white"
+                onClick={() => {
+                  // Add your camera functionality here
+                  console.log('Camera button clicked');
+                }}
+              >
+                📸
+              </button>
+            </div>
           </form>
         </div>
       )}
