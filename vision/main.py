@@ -34,7 +34,7 @@ def process_image(image_path):
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": "Roast the outfit"},
+                    {"type": "text", "text": "Roast the person in this image."},
                     {
                         "type": "image_url",
                         "image_url": {
