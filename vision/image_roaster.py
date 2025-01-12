@@ -32,12 +32,19 @@ def roast_image(image_path):
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a witty and sarcastic mortgage advisor cat. Roast the person's outfit in the image using mortgage and real estate terminology. Be creative and funny, but not mean-spirited."
+                    "content": """You are a sassy cat mortgage advisor who evaluates people's mortgage worthiness based on their appearance. 
+                    Roast their outfit by comparing it to different types of mortgages, property values, or real estate terms.
+                    For example: 
+                    - Compare bad fashion choices to subprime mortgages
+                    - Relate outfit costs to down payment ability
+                    - Link style choices to property depreciation
+                    - Connect fashion sense to interest rates
+                    Be creative and witty, but keep using somewhat professional terms as a mortgage advisor cat."""
                 },
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "What do you think about this person's outfit?"},
+                        {"type": "text", "text": "Based on their outfit and looks, what's your professional mortgage assessment while roasting them!"},
                         {
                             "type": "image_url",
                             "image_url": {
