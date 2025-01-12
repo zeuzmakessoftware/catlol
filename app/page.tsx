@@ -31,6 +31,7 @@ const useTypewriter = (text: string, speed: number = 14) => {
 
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const cameraRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showSpeechBubble, setShowSpeechBubble] = useState(false);
   const [userInput, setUserInput] = useState('');
@@ -38,6 +39,17 @@ export default function Home() {
   const { displayedText, isTyping } = useTypewriter(currentMessage);
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstClick, setIsFirstClick] = useState(true);
+  const [showCamera, setShowCamera] = useState(false);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+
+  useEffect(() => {
+    if (cameraRef.current && stream) {
+      cameraRef.current.srcObject = stream;
+      cameraRef.current.play().catch(err => {
+        console.error('Error playing video:', err);
+      });
+    }
+  }, [stream]);
 
   const generateResponse = async (isInitialGreeting = false) => {
     try {
@@ -103,8 +115,72 @@ export default function Home() {
     e.preventDefault();
   };
 
+  const startCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      });
+      setStream(mediaStream);
+      setShowCamera(true);
+    } catch (err) {
+      console.error('Error accessing camera:', err);
+    }
+  };
+
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+    setShowCamera(false);
+  };
+
+  const capturePhoto = () => {
+    if (cameraRef.current) {
+      const canvas = document.createElement('canvas');
+      canvas.width = cameraRef.current.videoWidth;
+      canvas.height = cameraRef.current.videoHeight;
+      canvas.getContext('2d')?.drawImage(cameraRef.current, 0, 0);
+      const photo = canvas.toDataURL('image/jpeg');
+      console.log('Captured photo:', photo);
+      stopCamera();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-screen relative gap-8">
+      {showCamera && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg">
+            <video
+              ref={cameraRef}
+              autoPlay
+              playsInline
+              muted
+              className="rounded-lg mb-4"
+              style={{ width: '400px', height: '300px' }}
+            />
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={capturePhoto}
+                className="px-4 py-2 bg-green-500 rounded-lg hover:bg-green-600 text-white"
+              >
+                Capture
+              </button>
+              <button
+                onClick={stopCamera}
+                className="px-4 py-2 bg-red-500 rounded-lg hover:bg-red-600 text-white"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showSpeechBubble && (
         <div className="relative px-6 py-4 bg-green-600 rounded-xl shadow-2xl speech-bubble border-4 border-green-900 w-[32rem]">
           <div className="bg-green-500 rounded-lg p-4 shadow-inner">
@@ -126,10 +202,7 @@ export default function Home() {
               <button
                 type="button"
                 className="px-4 py-2 bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 text-white"
-                onClick={() => {
-                  // Add your camera functionality here
-                  console.log('Camera button clicked');
-                }}
+                onClick={startCamera}
               >
                 📸
               </button>
