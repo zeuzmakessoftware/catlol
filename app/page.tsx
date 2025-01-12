@@ -140,6 +140,7 @@ export default function Home() {
 
   const capturePhoto = async () => {
     if (cameraRef.current) {
+      setIsLoading(true);
       const canvas = document.createElement('canvas');
       canvas.width = cameraRef.current.videoWidth;
       canvas.height = cameraRef.current.videoHeight;
@@ -147,6 +148,7 @@ export default function Home() {
       const photo = canvas.toDataURL('image/jpeg');
       
       try {
+        // Upload the image
         const response = await fetch('/api/upload', {
           method: 'POST',
           headers: {
@@ -157,15 +159,29 @@ export default function Home() {
 
         const data = await response.json();
         if (data.success) {
-          console.log('Image saved successfully:', data.filename);
-        } else {
-          console.error('Failed to save image');
+          // Get the roast
+          const roastResponse = await fetch('/api/getRoast', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ filename: data.filename }),
+          });
+          
+          const roastData = await roastResponse.json();
+          if (roastData.success) {
+            setCurrentMessage(roastData.roast);
+          } else {
+            setCurrentMessage("Meow! Sorry, I couldn't come up with a roast right now! 😿");
+          }
         }
       } catch (error) {
-        console.error('Error uploading image:', error);
+        console.error('Error:', error);
+        setCurrentMessage("*sad meow* Something went wrong with the roast! 😿");
+      } finally {
+        setIsLoading(false);
+        stopCamera();
       }
-
-      stopCamera();
     }
   };
 
