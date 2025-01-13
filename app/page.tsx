@@ -96,7 +96,7 @@ export default function Home() {
       video.play();
 
       if (isFirstClick) {
-        setCurrentMessage("Hi there! I'm your friendly cat mortgage advisor. How can I help you today? 😺");
+        setCurrentMessage("Hi there! I'm your friendly cat mortgage advisor. Introduce yourself or click the camera to get a purrfessional mortgage roast that'll have you feline assessed! 😺");
         setIsFirstClick(false);
       } else {
         await generateResponse();
