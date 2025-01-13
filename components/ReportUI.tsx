@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import useTypewriter from '@/lib/useTypewriter';
 import { Download, X } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface ReportUIProps {
   report: string;
@@ -116,9 +117,22 @@ const ReportUI: React.FC<ReportUIProps> = ({ report, onClose }) => {
         </h1>
         <div
           ref={scrollContainerRef}
-          className="text-lg font-mono text-[#2a2f4f] whitespace-pre-line"
+          className="markdown-content font-mono text-[#2a2f4f]"
         >
-          {displayedText}
+          <ReactMarkdown
+            components={{
+              h1: ({children}) => <h1 className="text-2xl font-bold my-4">{children}</h1>,
+              h2: ({children}) => <h2 className="text-xl font-bold my-3">{children}</h2>,
+              h3: ({children}) => <h3 className="text-lg font-bold my-2">{children}</h3>,
+              p: ({children}) => <p className="my-2">{children}</p>,
+              ul: ({children}) => <ul className="list-disc ml-4 my-2">{children}</ul>,
+              ol: ({children}) => <ol className="list-decimal ml-4 my-2">{children}</ol>,
+              li: ({children}) => <li className="my-1">{children}</li>,
+              code: ({children}) => <code className="bg-gray-100 px-1 rounded">{children}</code>,
+            }}
+          >
+            {displayedText}
+          </ReactMarkdown>
           {isTyping && <span className="animate-pulse">▊</span>}
         </div>
       </div>
