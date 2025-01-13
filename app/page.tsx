@@ -5,10 +5,12 @@ import useTypewriter from '@/lib/useTypewriter';
 import ReportUI from '@/components/ReportUI';
 import { gsap } from 'gsap';
 import { Camera } from 'lucide-react';
+import CatWithConfetti, { CatWithConfettiRef } from '@/components/CatWithConfetti';
 
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const cameraRef = useRef<HTMLVideoElement>(null);
+  const confettiRef = useRef<CatWithConfettiRef>(null);
   const speechBubbleRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showSpeechBubble, setShowSpeechBubble] = useState(false);
@@ -133,6 +135,7 @@ export default function Home() {
 
     setPromptCount((prev) => prev + 1);
     setUserInput('');
+    confettiRef.current?.activateConfetti()
     const video = videoRef.current;
   
     if (!isPlaying) {
@@ -259,6 +262,7 @@ export default function Home() {
       {showReport && (
         <ReportUI report={mortgageReport} onClose={() => setShowReport(false)} />
       )}
+      <CatWithConfetti ref={confettiRef} confettiCount={25} />
       {showCamera && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-lg">
@@ -291,8 +295,9 @@ export default function Home() {
       {showSpeechBubble && (
         <div
           ref={speechBubbleRef}
+          style={{ zIndex: 2 }}
           className="relative px-6 py-4 bg-green-600 rounded-xl shadow-sm speech-bubble border-4 border-green-900 
-                    max-w-[24rem] max-w-[36rem] md:max-w-[28rem] sm:max-w-[22rem] hue-rotate-[-5deg] brightness-[1.1] saturate-[1.4]"
+                    max-w-[24rem] lg:max-w-[55rem] md:max-w-[40rem] sm:max-w-[34rem] hue-rotate-[-5deg] brightness-[1.1] saturate-[1.4]"
         >
           <div className="bg-green-500 rounded-lg p-4 shadow-inner max-h-[14rem] overflow-y-auto 
                           lg:p-5 lg:max-h-[16rem] md:p-4 md:max-h-[12rem] sm:p-3 sm:max-h-[10rem]">

@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CATLOL",
-  description: "Client Advice Transaction Loan Optimization Liasion",
+  title: "CATTLOL",
+  description: "Client Advice Transaction Tracker Loan Optimization Liasion",
 };
 
 export default function RootLayout({
