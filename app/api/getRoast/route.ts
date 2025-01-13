@@ -14,6 +14,7 @@ export async function POST(request: Request) {
         const roast = await readFile(roastPath, 'utf-8');
         return NextResponse.json({ success: true, roast });
       } catch (error) {
+        console.error('Error generating roast:', error);
         await new Promise(resolve => setTimeout(resolve, 1000));
         attempts++;
       }
@@ -21,6 +22,7 @@ export async function POST(request: Request) {
     
     throw new Error('Timeout waiting for roast');
   } catch (error) {
+    console.error('Failed to get roast:', error);
     return NextResponse.json({ success: false, error: 'Failed to get roast' }, { status: 500 });
   }
 }

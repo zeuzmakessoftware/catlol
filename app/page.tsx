@@ -107,6 +107,7 @@ export default function Home() {
 
       if (isFirstClick) {
         setRawResponse("Hi there! I'm your friendly cat mortgage advisor. Introduce yourself or click the camera to get a purrfessional mortgage roast that'll have you feline assessed! 😺");
+       // setRawResponse("Hi there! I'm your friendly cat mortgage advisor. Click me again to start a conversation!"); // Original prompt
         setIsFirstClick(false);
       } else {
         await generateResponse();
@@ -205,14 +206,14 @@ export default function Home() {
           clearInterval(playVideoInterval);
           
           if (roastData.success) {
-            setCurrentMessage(roastData.roast);
+            setRawResponse(roastData.roast);
           } else {
-            setCurrentMessage("Meow! Sorry, I couldn't come up with a roast right now! 😿");
+            setRawResponse("Meow! Sorry, I couldn't come up with a roast right now! 😿");
           }
         }
       } catch (error) {
         console.error('Error:', error);
-        setCurrentMessage("*sad meow* Something went wrong with the roast! 😿");
+        setRawResponse("*sad meow* Something went wrong with the roast! 😿");
       } finally {
         setIsLoading(false);
         if (videoRef.current) {
