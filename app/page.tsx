@@ -41,7 +41,6 @@ export default function Home() {
   const [isFirstClick, setIsFirstClick] = useState(true);
   const [showCamera, setShowCamera] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [currentMessage, setCurrentMessage] = useState('');
 
   useEffect(() => {
     if (cameraRef.current && stream) {
@@ -167,49 +166,35 @@ export default function Home() {
 
   const capturePhoto = async () => {
     if (cameraRef.current) {
-      // Capture the frame first
       const canvas = document.createElement('canvas');
       canvas.width = cameraRef.current.videoWidth;
       canvas.height = cameraRef.current.videoHeight;
       canvas.getContext('2d')?.drawImage(cameraRef.current, 0, 0);
-      const photo = canvas.toDataURL('image/jpeg');
-      
-      // Immediately stop camera and hide interface
+      const photo = canvas.toDataURL('image/jpeg'); // The photo is already in base64 format
+  
       stopCamera();
       setIsLoading(true);
       setShowSpeechBubble(true);
-      
+  
       try {
-        // Start playing video while waiting
         const playVideoInterval = setInterval(playVideo, 2500);
-        
-        const response = await fetch('/api/upload', {
+  
+        const response = await fetch('/api/vision', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ image: photo }),
+          body: JSON.stringify({ image: photo.split(',')[1] }), // Send only the base64-encoded string
         });
-
-        const data = await response.json();
-        if (data.success) {
-          const roastResponse = await fetch('/api/getRoast', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ filename: data.filename }),
-          });
-          
-          const roastData = await roastResponse.json();
-          // Clear the interval once we have a response
-          clearInterval(playVideoInterval);
-          
-          if (roastData.success) {
-            setRawResponse(roastData.roast);
-          } else {
-            setRawResponse("Meow! Sorry, I couldn't come up with a roast right now! 😿");
-          }
+  
+        const roastData = await response.json();
+        console.log(roastData);
+        clearInterval(playVideoInterval);
+  
+        if (roastData.choices && roastData.choices[0]?.message?.content) {
+          setRawResponse(roastData.choices[0].message.content); // Set the raw response to the message content
+        } else {
+          setRawResponse("Meow! Sorry, I couldn't come up with a roast right now! 😿");
         }
       } catch (error) {
         console.error('Error:', error);
@@ -223,6 +208,7 @@ export default function Home() {
       }
     }
   };
+  
 
   return (
     <div className="flex flex-col items-center justify-center h-screen relative gap-8">

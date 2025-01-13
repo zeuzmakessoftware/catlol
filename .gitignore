@@ -45,3 +45,5 @@ __pycache__/
 */images
 __init__.py
 /venv
+
+**/venv

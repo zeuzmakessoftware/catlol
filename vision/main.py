@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import camera  # Direct import
 
 # Load environment variables from parent directory's .env file
-load_dotenv(dotenv_path='../.env')
+load_dotenv(dotenv_path='../.env.local')
 
 # Get API key with error handling
 api_key = os.environ.get("NEBIUS_API_KEY")
