@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 
 // Custom hook for typewriter effect
-const useTypewriter = (text: string, speed: number = 14) => {
+const useTypewriter = (text: string, typingSpeed: number = 14) => {
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (text) {
       setIsTyping(true);
       setDisplayedText('');
@@ -20,11 +20,11 @@ const useTypewriter = (text: string, speed: number = 14) => {
           setIsTyping(false);
           clearInterval(timer);
         }
-      }, speed);
+      }, typingSpeed);
 
       return () => clearInterval(timer);
     }
-  }, [text, speed]); // Ensure effect triggers when text changes
+  }, [text, typingSpeed]);
 
   return { displayedText, isTyping };
 };
@@ -35,8 +35,8 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showSpeechBubble, setShowSpeechBubble] = useState(false);
   const [userInput, setUserInput] = useState('');
-  const [currentMessage, setCurrentMessage] = useState('');
-  const { displayedText, isTyping } = useTypewriter(currentMessage);
+  const [rawResponse, setRawResponse] = useState('');
+  const { displayedText, isTyping } = useTypewriter(rawResponse);
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstClick, setIsFirstClick] = useState(true);
   const [showCamera, setShowCamera] = useState(false);
@@ -54,6 +54,8 @@ export default function Home() {
   const generateResponse = async (isInitialGreeting = false) => {
     try {
       setIsLoading(true);
+      setRawResponse('');
+
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -66,14 +68,21 @@ export default function Home() {
         }),
       });
 
-      if (!response.ok) throw new Error('API request failed');
+      if (!response.body) throw new Error('No response body');
 
-      const data = await response.json();
-      console.log("API Response:", data);
-      setCurrentMessage(data.message || "Oops, no response received!");
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+
+      while (!done) {
+        const { value, done: readerDone } = await reader.read();
+        done = readerDone;
+        const chunk = decoder.decode(value, { stream: true });
+        setRawResponse((prev) => prev + chunk);
+      }
     } catch (error) {
       console.error('Error:', error);
-      setCurrentMessage("*sad meow* My whiskers are tingling with API issues... try again later? :3");
+      setRawResponse("*sad meow* My whiskers are tingling with API issues... try again later? :3");
     } finally {
       setIsLoading(false);
     }
@@ -97,6 +106,7 @@ export default function Home() {
 
       if (isFirstClick) {
         setCurrentMessage("Hi there! I'm your friendly cat mortgage advisor. Introduce yourself or click the camera to get a purrfessional mortgage roast that'll have you feline assessed! 😺");
+       // setRawResponse("Hi there! I'm your friendly cat mortgage advisor. Click me again to start a conversation!"); // Original prompt
         setIsFirstClick(false);
       } else {
         await generateResponse();
@@ -111,8 +121,8 @@ export default function Home() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    handleVideoClick();
     e.preventDefault();
+    await handleVideoClick();
   };
 
   const startCamera = async () => {
