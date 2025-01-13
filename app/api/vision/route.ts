@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         Authorization: `Bearer ${NEBIUS_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "llava-hf/llava-1.5-13b-hf",
+        model: "Qwen/Qwen2-VL-72B-Instruct",
         messages: [
           {
             role: "system",

@@ -25,6 +25,8 @@ export default function Home() {
   const [mortgageReport, setMortgageReport] = useState('');
   const [showReport, setShowReport] = useState(false);
   const [promptCount, setPromptCount] = useState(0);
+  const [multipleChoices, setMultipleChoices] = useState<string[]>([]);
+  const [showChoices, setShowChoices] = useState(false);
 
   useEffect(() => {
     if (cameraRef.current && stream) {
@@ -41,6 +43,71 @@ export default function Home() {
     }
   }, [showSpeechBubble]);
 
+  useEffect(() => {
+    parseResponseForChoices();
+  }, [rawResponse]);
+
+  useEffect(() => {
+    if (multipleChoices.length > 0) {
+      const timeout = setTimeout(() => {
+        setShowChoices(true);
+        animateChoices();
+      }, 5000);
+  
+      return () => clearTimeout(timeout);
+    } else {
+      setShowChoices(false);
+    }
+  }, [multipleChoices]);  
+
+  const startCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        } 
+      });
+      setStream(mediaStream);
+  
+      setShowCamera(true);
+
+      gsap.fromTo(
+        '.camera-container',
+        { x: '100%', autoAlpha: 0 },
+        { x: '0%', autoAlpha: 1, duration: 0.8, ease: 'power3.out' }
+      );
+    } catch (err) {
+      console.error('Error accessing camera:', err);
+    }
+  };
+  
+  // Stop the camera with animation
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+  
+    // Hide camera container with animation
+    gsap.to('.camera-container', {
+      autoAlpha: 0,
+      scale: 0.8,
+      duration: 0.6,
+      ease: 'power3.in',
+      onComplete: () => setShowCamera(false), // Ensure it's hidden after animation
+    });
+  };
+
+  const animateChoices = () => {
+    const choicesContainer = document.querySelectorAll('.choice-button');
+    gsap.fromTo(
+      choicesContainer,
+      { autoAlpha: 0, y: 20 },
+      { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.2, ease: 'power3.out' }
+    );
+  };  
+
   const animateSpeechBubble = () => {
     if (speechBubbleRef.current) {
       gsap.fromTo(
@@ -50,6 +117,21 @@ export default function Home() {
       );
     }
   };
+
+  const parseBoldText = (text: string) => {
+    const truncatedText = text.split("1.")[0].trim();
+    return truncatedText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+  };
+  
+
+  const parseResponseForChoices = () => {
+    const match = rawResponse.match(/(\d+\.\s.+?)(?=\n|$)/g);
+    if (match) {
+      setMultipleChoices(match.map((choice) => choice.trim()));
+    } else {
+      setMultipleChoices([]);
+    }
+  };  
 
   const fetchMortgageReport = async (log: { prompt: string; response: string }[]) => {
     try {
@@ -74,20 +156,37 @@ export default function Home() {
       );
     }
   };
+
+  const handleChoiceClick = (choice: string) => {  
+    setInteractionLog((prev) => [
+      ...prev,
+      { prompt: rawResponse, response: choice },
+    ]);
+  
+    setMultipleChoices([]);
+    playVideo();
+    setRawResponse('');
+    generateResponse();
+  };  
   
   const generateResponse = async (isInitialGreeting = false) => {
     try {
       setIsLoading(true);
       setRawResponse('');
   
+      const pastInteractions = interactionLog
+        .map(({ prompt, response }) => `User: ${prompt}\nCat: ${response}`)
+        .join('\n\n');
       const inputText = isInitialGreeting
         ? "Say hi and introduce yourself as a cat mortgage advisor!"
-        : userInput || "Tell me about mortgages";
+        : userInput || "Tell me about either refinancing an existing loan or trying to get a new loan";
+  
+      const fullInput = `${pastInteractions}\n\nUser: ${inputText}`;
   
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input: inputText }),
+        body: JSON.stringify({ input: fullInput }),
       });
   
       if (!response.body) throw new Error('No response body');
@@ -113,18 +212,14 @@ export default function Home() {
         }
         return updatedLog;
       });
-  
-      if (interactionLog.length === 10) {
-        fetchMortgageReport(interactionLog);
-      }
     } catch (error) {
       console.error('Error:', error);
       setRawResponse("*sad meow* My whiskers are tingling with API issues... try again later? :3");
     } finally {
       setIsLoading(false);
     }
-  };  
-  
+  };
+    
   const handleVideoClick = async () => {
     if (!videoRef.current || isTyping || isLoading) return;
   
@@ -170,29 +265,6 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await handleVideoClick();
-  };
-
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        } 
-      });
-      setStream(mediaStream);
-      setShowCamera(true);
-    } catch (err) {
-      console.error('Error accessing camera:', err);
-    }
-  };
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
-    }
-    setShowCamera(false);
   };
 
   const playVideo = () => {
@@ -264,31 +336,33 @@ export default function Home() {
       )}
       <CatWithConfetti ref={confettiRef} confettiCount={25} />
       {showCamera && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-lg">
-            <video
-              ref={cameraRef}
-              autoPlay
-              playsInline
-              muted
-              className="rounded-lg mb-4"
-              style={{ width: '400px', height: '300px' }}
-            />
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={capturePhoto}
-                className="px-4 py-2 bg-green-500 rounded-lg hover:bg-green-600 text-white"
-              >
-                Capture
-              </button>
-              <button
-                onClick={stopCamera}
-                className="px-4 py-2 bg-red-500 rounded-lg hover:bg-red-600 text-white"
-              >
-                Close
-              </button>
-            </div>
-          </div>
+        <div className="camera-container fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gradient-to-r from-green-700 to-green-600 border-2 border-green-400 p-4 rounded-3xl relative">
+      <button
+        onClick={stopCamera}
+        className="top-4 right-4 float-right text-neutral-300 hover:text-neutral-500"
+      >
+        &#x2715;
+      </button>
+      
+      <video
+        ref={cameraRef}
+        autoPlay
+        playsInline
+        muted
+        className="rounded-lg mb-4 border-2 border-green-400 w-full max-w-lg my-8"
+      />
+      
+      <div className="flex justify-center gap-4">
+        <button
+          onClick={capturePhoto}
+          className="px-6 py-3 bg-green-500 rounded-lg hover:bg-green-600 text-white flex items-center justify-center gap-2 w-full max-w-sm"
+        >
+          <Camera className="w-6 h-6" />
+          
+        </button>
+      </div>
+    </div>
         </div>
       )}
 
@@ -297,15 +371,26 @@ export default function Home() {
           ref={speechBubbleRef}
           style={{ zIndex: 2 }}
           className="relative px-6 py-4 bg-green-600 rounded-xl shadow-sm speech-bubble border-4 border-green-900 
-                    max-w-[24rem] lg:max-w-[55rem] md:max-w-[40rem] sm:max-w-[34rem] hue-rotate-[-5deg] brightness-[1.1] saturate-[1.4]"
+                    max-w-[24rem] lg:max-w-[55rem] md:max-w-[45rem] sm:max-w-[34rem] hue-rotate-[-5deg] brightness-[1.1] saturate-[1.4]"
         >
-          <div className="bg-green-500 rounded-lg p-4 shadow-inner max-h-[14rem] overflow-y-auto 
-                          lg:p-5 lg:max-h-[16rem] md:p-4 md:max-h-[12rem] sm:p-3 sm:max-h-[10rem]">
-            <p className="text-lg font-semibold text-black min-h-[4rem] font-mono tracking-tighter 
-                           sm:min-h-[3rem]">
-              {isLoading ? "Thinking... =^･ｪ･^=" : displayedText}
+          <div className="bg-green-500 rounded-lg p-4 shadow-inner max-h-[16rem] overflow-y-auto">
+            <p className="text-lg font-semibold text-black min-h-[4rem] font-mono tracking-tighter">
+              {isLoading ? "Thinking... =^･ｪ･^=" : parseBoldText(displayedText)}
               {(isTyping || isLoading) && <span className="animate-pulse">▊</span>}
             </p>
+            {showChoices && (
+              <div className="mt-4 space-y-2">
+                {multipleChoices.map((choice, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleChoiceClick(choice)}
+                    className="choice-button w-full px-4 py-2 bg-green-600 text-black font-semibold font-mono tracking-tighter rounded-lg hover:bg-green-600 text-left hover:bg-green-700 transition duration-300 ease-in-out"
+                  >
+                    {choice.slice(3, choice.length)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <form onSubmit={handleSubmit} className="mt-4 md:mt-3 sm:mt-2">
             <div className="flex gap-2">
