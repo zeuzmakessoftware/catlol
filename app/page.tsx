@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 // Custom hook for typewriter effect
 const useTypewriter = (text: string, typingSpeed: number = 14) => {
@@ -41,6 +41,7 @@ export default function Home() {
   const [isFirstClick, setIsFirstClick] = useState(true);
   const [showCamera, setShowCamera] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [currentMessage, setCurrentMessage] = useState('');
 
   useEffect(() => {
     if (cameraRef.current && stream) {
@@ -105,8 +106,7 @@ export default function Home() {
       video.play();
 
       if (isFirstClick) {
-        setCurrentMessage("Hi there! I'm your friendly cat mortgage advisor. Introduce yourself or click the camera to get a purrfessional mortgage roast that'll have you feline assessed! 😺");
-       // setRawResponse("Hi there! I'm your friendly cat mortgage advisor. Click me again to start a conversation!"); // Original prompt
+        setRawResponse("Hi there! I'm your friendly cat mortgage advisor. Introduce yourself or click the camera to get a purrfessional mortgage roast that'll have you feline assessed! 😺");
         setIsFirstClick(false);
       } else {
         await generateResponse();
