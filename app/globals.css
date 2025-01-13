@@ -19,7 +19,7 @@ body {
   transform: translateX(-50%);
   border-width: 20px 20px 0;
   border-style: solid;
-  border-color: #917FB3 transparent transparent transparent;
+  border-color: #428741 transparent transparent transparent;
 }
 
 @keyframes popIn {
