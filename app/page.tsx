@@ -206,7 +206,7 @@ export default function Home() {
   
       setInteractionLog((prev) => {
         const updatedLog = [...prev, { prompt: inputText, response: accumulatedResponse }];
-        if (updatedLog.length === 10) {
+        if (updatedLog.length === 11) { // Apparently this has to be an odd number for some reason or else it doesn't work
           fetchMortgageReport(updatedLog);
           return [];
         }
@@ -296,8 +296,6 @@ export default function Home() {
       setShowSpeechBubble(true);
   
       try {
-        const playVideoInterval = setInterval(playVideo, 7500);
-  
         const response = await fetch('/api/vision', {
           method: 'POST',
           headers: {
@@ -307,9 +305,9 @@ export default function Home() {
         });
   
         const roastData = await response.json();
-        clearInterval(playVideoInterval);
   
         if (roastData.choices && roastData.choices[0]?.message?.content) {
+          //handleChoiceClick(roastData.choices[0].message.content);
           roastData.choices[0].message.content += ' Click me to dive into your mortgage questions!';
           setRawResponse(roastData.choices[0].message.content);
         } else {
@@ -427,6 +425,8 @@ export default function Home() {
         className="cursor-pointer rounded-xl hover:scale-105 transition-transform duration-300 ease-in-out"
         onClick={handleVideoClick}
         preload="metadata"
+        webkit-playsinline="true"
+        playsInline
         style={{
           width: '600px',
           height: 'auto',

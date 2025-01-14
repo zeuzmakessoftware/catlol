@@ -17,7 +17,6 @@ const CatWithConfetti = forwardRef<CatWithConfettiRef, CatWithConfettiProps>(
     const containerRef = useRef<HTMLDivElement>(null);
 
     const activateConfetti = () => {
-      console.log('Activating confetti');
       const container = containerRef.current;
       if (!container) return;
 
