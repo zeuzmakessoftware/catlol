@@ -25,7 +25,6 @@ export default function Home() {
   const [interactionLog, setInteractionLog] = useState<{ prompt: string; response: string }[]>([]);
   const [mortgageReport, setMortgageReport] = useState('');
   const [showReport, setShowReport] = useState(false);
-  const [promptCount, setPromptCount] = useState(0);
   const [multipleChoices, setMultipleChoices] = useState<string[]>([]);
   const [showChoices, setShowChoices] = useState(false);
 
@@ -229,7 +228,6 @@ export default function Home() {
       return;
     }
 
-    setPromptCount((prev) => prev + 1);
     setUserInput('');
     confettiRef.current?.activateConfetti()
     const video = videoRef.current;
@@ -405,7 +403,7 @@ export default function Home() {
                           lg:text-lg md:text-base sm:text-sm sm:px-3 sm:py-1.5"
                 disabled={isLoading}
               />
-              {promptCount < 2 && (
+              {interactionLog.length < 2 && (
                 <button
                   type="button"
                   className="px-4 py-2 bg-green-500 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 
@@ -439,7 +437,7 @@ export default function Home() {
 
       <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 w-2/3 max-w-3xl">
         <ProgressBar 
-          percentage={(promptCount / 10) * 100} 
+          percentage={(interactionLog.length / 10) * 100} 
           height="24px"
           backgroundColor="#2F4F4F20"
           fillColor="linear-gradient(90deg, #4CAF50, #81C784)"
