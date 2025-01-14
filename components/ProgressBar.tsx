@@ -1,5 +1,5 @@
 interface ProgressBarProps {
-  percentage: number;
+  percentage: number; 
   height?: string;
   backgroundColor?: string;
   fillColor?: string;
