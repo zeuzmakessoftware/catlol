@@ -6,6 +6,7 @@ import ReportUI from '@/components/ReportUI';
 import { gsap } from 'gsap';
 import { Camera } from 'lucide-react';
 import CatWithConfetti, { CatWithConfettiRef } from '@/components/CatWithConfetti';
+import ProgressBar from '@/components/ProgressBar';
 
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -331,6 +332,15 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen relative gap-8">
+      <div className="fixed top-4 left-4 right-4 z-50">
+        <ProgressBar 
+          percentage={(promptCount / 10) * 100} 
+          height="8px"
+          backgroundColor="#2F4F4F"
+          fillColor="#4CAF50"
+        />
+      </div>
+      
       {showReport && (
         <ReportUI report={mortgageReport} onClose={() => setShowReport(false)} />
       )}
