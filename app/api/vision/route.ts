@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         messages: [
           {
             role: "system",
-            content: "Make the response very short. Comically analyze myself in the image in 1-2 sentences. Deliver a witty roast tying their fashion to mortgage or real estate terms. For example 'Looking at you, your style screams 'adjustable-rate personality'—starts bold but shifts unpredictably, like a house with curb appeal but a questionable foundation.'",
+            content: "Make the response short. Comically analyze myself(features and clothing) in the image in 2-3 sentences. Deliver a witty roast tying their fashion to mortgage or real estate terms. For example 'Looking at you, your style screams 'adjustable-rate personality'—starts bold but shifts unpredictably, like a house with curb appeal but a questionable foundation.",
           },
           {
             role: "user",
