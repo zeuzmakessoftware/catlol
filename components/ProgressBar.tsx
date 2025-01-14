@@ -2,7 +2,7 @@ interface ProgressBarProps {
   percentage: number; 
   height?: string;
   backgroundColor?: string;
-  fillColor?: string;
+  fillColor?: string; 
 }
 
 const ProgressBar = ({ 
