@@ -27,6 +27,7 @@ export default function Home() {
   const [showReport, setShowReport] = useState(false);
   const [multipleChoices, setMultipleChoices] = useState<string[]>([]);
   const [showChoices, setShowChoices] = useState(false);
+  const hasTriggeredConfetti = useRef(false);
 
   useEffect(() => {
     if (cameraRef.current && stream) {
@@ -326,7 +327,17 @@ export default function Home() {
       }
     }
   };
-  
+
+  const handleProgressComplete = () => {
+    if (hasTriggeredConfetti.current) return;
+    hasTriggeredConfetti.current = true;
+    
+    confettiRef.current?.activateConfetti();
+    setTimeout(() => {
+      confettiRef.current?.activateConfetti();
+      hasTriggeredConfetti.current = false; // Reset after second confetti
+    }, 250);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen relative gap-8">
@@ -441,6 +452,7 @@ export default function Home() {
           height="24px"
           backgroundColor="#2F4F4F20"
           fillColor="linear-gradient(90deg, #4CAF50, #81C784)"
+          onComplete={handleProgressComplete}
         />
       </div>
     </div>

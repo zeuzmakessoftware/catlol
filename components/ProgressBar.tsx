@@ -1,19 +1,32 @@
+import React, { useEffect, useRef } from 'react';
+
 interface ProgressBarProps {
   percentage: number;
   height?: string;
   backgroundColor?: string;
   fillColor?: string;
+  onComplete?: () => void;
 }
 
 const ProgressBar = ({ 
   percentage, 
   height = '24px',
   backgroundColor = '#2F4F4F20',
-  fillColor = 'linear-gradient(90deg, #4CAF50, #81C784)'
+  fillColor = 'linear-gradient(90deg, #4CAF50, #81C784)',
+  onComplete
 }: ProgressBarProps) => {
+  const prevPercentage = useRef(percentage);
+
+  useEffect(() => {
+    if (percentage >= 100 && prevPercentage.current < 100 && onComplete) {
+      onComplete();
+    }
+    prevPercentage.current = percentage;
+  }, [percentage, onComplete]);
+
   return (
     <div className="relative">
-      {/* Checkpoints */}
+      {/* First Checkpoint */}
       <div 
         className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 
                    bg-green-100 rounded-full border-2 border-green-500 z-10"
@@ -22,11 +35,9 @@ const ProgressBar = ({
           backgroundColor: percentage >= 50 ? '#4CAF50' : '#f0f0f0'
         }}
       >
-        {percentage >= 50 && (
-          <div className="absolute inset-0 flex items-center justify-center text-white">
-            ✓
-          </div>
-        )}
+        <div className="absolute inset-0 flex items-center justify-center">
+          {percentage >= 50 ? '🐱' : '😺'}
+        </div>
       </div>
       <div 
         className="absolute top-1/2 right-0 transform -translate-y-1/2 w-8 h-8 
