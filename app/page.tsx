@@ -332,15 +332,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen relative gap-8">
-      <div className="fixed top-4 left-4 right-4 z-50">
-        <ProgressBar 
-          percentage={(promptCount / 10) * 100} 
-          height="8px"
-          backgroundColor="#2F4F4F"
-          fillColor="#4CAF50"
-        />
-      </div>
-      
       {showReport && (
         <ReportUI report={mortgageReport} onClose={() => setShowReport(false)} />
       )}
@@ -445,6 +436,15 @@ export default function Home() {
       >
         Your browser does not support the video tag.
       </video>
+
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 w-2/3 max-w-3xl">
+        <ProgressBar 
+          percentage={(promptCount / 10) * 100} 
+          height="24px"
+          backgroundColor="#2F4F4F20"
+          fillColor="linear-gradient(90deg, #4CAF50, #81C784)"
+        />
+      </div>
     </div>
   );
 }
