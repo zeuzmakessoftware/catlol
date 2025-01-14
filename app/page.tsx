@@ -247,7 +247,7 @@ export default function Home() {
   
       if (isFirstClick) {
         setRawResponse(
-          "Hi there! I'm your friendly cat mortgage advisor. Introduce yourself or click the camera to get a purrfessional mortgage roast that'll have you feline assessed! :3"
+          "Hhiii there! I'm your friendly cat mortgage advisor. Introduce yourself or click the camera to get a purrfessional mortgage roast that'll have you feline assessed! :3"
         );
         setIsFirstClick(false);
       } else {
