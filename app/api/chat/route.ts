@@ -27,7 +27,7 @@ export async function POST(req: Request) {
               content: input,
             },
           ],
-          model: 'llama-3.3-70b-specdec',
+          model: 'llama-3.3-70b-versatile',
           temperature: 1,
           max_tokens: 1024,
           top_p: 1,
