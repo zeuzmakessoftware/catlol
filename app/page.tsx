@@ -147,7 +147,7 @@ export default function Home() {
       setMortgageReport(data.report);
   
       setRawResponse(
-        "Meow! I’ve carefully reviewed your inputs and prepared a detailed mortgage report for you! 😺 Click the video to view it. If you wish to try the app again, you can reload the page. 🐾"
+        "Meow! I’ve carefully reviewed your inputs and prepared a detailed mortgage report for you! 😺 Click me to view it. If you wish to try the app again, you can reload the page. 🐾"
       );
     } catch (error) {
       console.error('Error fetching mortgage report:', error);
